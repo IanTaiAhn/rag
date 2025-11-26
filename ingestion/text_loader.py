@@ -1,12 +1,9 @@
-# ingestion/text_loader.py
 from pathlib import Path
 
-
-def load_text_file(path: str) -> str:
-    return Path(path).read_text()
-
+def load_text_file(path: Path) -> str:
+    return path.read_text(encoding="utf-8", errors="ignore")
 
 if __name__ == "__main__":
     p = Path(__file__).parent.parent / "data" / "raw_docs"
     for f in p.glob("*.txt"):
-        print(f, len(f.read_text()))
+        print(f, len(load_text_file(f)))

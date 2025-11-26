@@ -33,7 +33,7 @@ def load_all_documents():
 
         elif ext in [".txt", ".md"]:
             print(f"Loading text file: {file}")
-            text = file.read_text(encoding="utf-8", errors="ignore")
+            text = load_text_file(file)
 
         else:
             print(f"Skipping unsupported file: {file}")
