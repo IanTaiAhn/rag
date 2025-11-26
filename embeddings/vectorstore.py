@@ -5,18 +5,16 @@ import numpy as np
 import pickle
 from typing import List, Dict
 
-INDEX_PATH = os.getenv("VECTOR_STORE_PATH", "./data/faiss_index")
-
+INDEX_PATH = os.getenv("VECTOR_STORE_PATH", "./vectorstore")
 
 class FaissStore:
     def __init__(self, dim: int):
         self.dim = dim
-        self.index = faiss.IndexFlatIP(dim)  # inner product for cosine if vectors normalized
+        self.index = faiss.IndexFlatIP(dim)  # cosine if normalized
         self.metadatas = []
 
     def add(self, vectors: List[np.ndarray], metadatas: List[Dict]):
         arr = np.vstack(vectors).astype('float32')
-        # normalize for cosine
         faiss.normalize_L2(arr)
         self.index.add(arr)
         self.metadatas.extend(metadatas)
