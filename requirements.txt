@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+pydantic
+python-multipart
+requests
+faiss-cpu
+sentence-transformers
+transformers
+torch
+tqdm
+pdfplumber
+numpy
+scipy
+openai
+python-dotenv
