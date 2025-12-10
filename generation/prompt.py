@@ -13,12 +13,12 @@ Question: {question}
 Answer:
 """
 
-
 def build_prompt(chunks: List[dict], question: str) -> str:
     ctx = []
     for c in chunks:
         md = c['metadata']
-        text = md.get('text') or md.get('chunk_text') or '"
+        # fallback to empty string if neither key exists
+        text = md.get('text') or md.get('chunk_text') or ""
         src = f"[{md.get('doc_id','unknown')}:{md.get('chunk_id','?')}]"
         ctx.append(f"{src} {text}")
     context = "\n\n".join(ctx)

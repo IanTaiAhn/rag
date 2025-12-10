@@ -10,6 +10,11 @@ import numpy as np
 from pathlib import Path
 from tqdm import tqdm
 
+from generation.generator import generate_answer
+from generation.prompt import build_prompt
+from retrieval.reranker import Reranker
+from retrieval.retriever import Retriever
+
 from ingestion.pdf_loader import load_pdf_text
 from ingestion.text_loader import load_text_file
 from chunking.chunker import chunk_text
@@ -22,7 +27,6 @@ INDEX_DIR = Path("vectorstore")
 
 
 def load_all_documents():
-    """Load all .txt, .md, or .pdf files into memory."""
 
     # break here TODO
     print('load docs portion: ', os.getcwd())
@@ -96,5 +100,27 @@ def build_index():
     print(f"Total vectors stored: {store.index.ntotal}")
 
 
+def answer_question(query: str):
+    embedder = get_embedder()
+    # use len() since embed returns list of floats
+    print('got an embedder')
+    dim = len(embedder.embed(["test"])[0])
+    store = FaissStore.load(dim)
+    print("i have a store?")
+    retriever = Retriever(embedder, store, top_k=8)
+    candidates = retriever.retrieve(query)
+
+    # reranker = Reranker()
+    # reranked = reranker.rerank(query, candidates, top_k=5)
+    # prompt = build_prompt(reranked, query)
+
+    prompt = build_prompt(candidates, query)
+    return generate_answer(prompt)
+
+
+# Example
+
+
 if __name__ == "__main__":
     build_index()
+    print(answer_question("Explain modal jazz"))
