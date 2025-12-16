@@ -122,5 +122,10 @@ def answer_question(query: str):
 
 
 if __name__ == "__main__":
-    build_index()
-    print(answer_question("Explain modal jazz"))
+    # build_index()
+    # print(answer_question("Explain modal jazz"))
+    # answer_question("I'm gonna launch a potato and the castle over there. What should I use to launch it?")
+    # answer_question("What is the main landmark in Aurelia?")
+    # answer_question("What is an eigenvalue?")
+    answer_question("What subjects pertain to having credible evidence?")
+    

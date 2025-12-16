@@ -19,8 +19,29 @@ def generate_answer(prompt: str, max_tokens: int = 256):
         return res['choices'][0]['message']['content']
     else:
         # fallback: local small model using transformers (approx)
-        print("I tried to use a small gpt-2")
+        print("I'm using a locally loaded model")
         from transformers import pipeline
-        pipe = pipeline('text-generation', model='gpt2', device=-1)
+        from transformers import GPT2LMHeadModel, GPT2TokenizerFast
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+
+        # model_path = "../models/gpt2"
+        model_path = "../models/qwen2.5"   # your local Qwen2.5 folder
+
+        # # GPT2 tokenizer and model
+        # tokenizer = GPT2TokenizerFast.from_pretrained(model_path)
+        # model = GPT2LMHeadModel.from_pretrained(model_path)
+
+        # Load tokenizer + model
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        model = AutoModelForCausalLM.from_pretrained(model_path)
+        
+        pipe = pipeline(
+            "text-generation",
+            model=model,
+            tokenizer=tokenizer,
+            device=-1
+        )
+
         out = pipe(prompt, max_length=512, do_sample=False)
+        print(out[0]["generated_text"])
         return out[0]['generated_text']
