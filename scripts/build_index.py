@@ -20,6 +20,8 @@ from ingestion.text_loader import load_text_file
 from chunking.chunker import chunk_text
 from embeddings.embedder import get_embedder
 from embeddings.vectorstore import FaissStore
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
 
 
 DATA_DIR = Path("../data/raw_docs")
@@ -60,8 +62,19 @@ def build_index():
 
     print("Loading embedding model...")
     embed = get_embedder()
-    print('embed model: ', embed)
+    print("embed model:", embed)
 
+    # 🔥 NEW: load tokenizer for token-accurate chunking
+    model_path = "../models/qwen2.5"   # your local Qwen2.5 folder
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    # tokenizer = get_generation_tokenizer()  
+    # e.g., AutoTokenizer.from_pretrained("../models/qwen2.5")
+
+        # # GPT2 tokenizer and model
+        # tokenizer = GPT2TokenizerFast.from_pretrained(model_path)
+        # model = GPT2LMHeadModel.from_pretrained(model_path)
+
+        # Load tokenizer + model
     store = None
 
     docs = load_all_documents()
@@ -69,26 +82,35 @@ def build_index():
 
     for doc_name, text in docs:
         print(f"\nChunking {doc_name}...")
-        chunks = chunk_text(text)
-        # print("DEBUG chunks:", chunks[:3], [type(c) for c in chunks[:3]])
+
+        # 🔥 Pass tokenizer into chunk_text
+        chunks = chunk_text(
+            text,
+            tokenizer=tokenizer,
+            max_tokens=400,
+            overlap=100,
+            min_chunk_tokens=150
+        )
 
         chunk_texts = [c["text"] for c in chunks]
 
-        print(f"Embedding {len(chunks)} chunks...")
-        print(f"Embedding {len(chunk_texts)} chunks texts...")
+        print(f"Embedding {len(chunk_texts)} chunks...")
 
-        vectors = embed.embed(chunk_texts)  # returns list of numpy vectors
-        # print('vectors: ', vectors)
-        print('vectors type: ', type(vectors))
-        
+        vectors = embed.embed(chunk_texts)
+        print("vectors type:", type(vectors))
 
         if store is None:
             dim = len(vectors[0])
             store = FaissStore(dim)
 
+        # 🔥 FIX: store the actual chunk text, not the whole dict
         metadatas = [
-            {"doc_name": doc_name, "chunk_id": i, "text": chunks[i]}
-            for i in range(len(chunks))
+            {
+                "doc_name": doc_name,
+                "chunk_id": c["chunk_id"],
+                "text": c["text"]
+            }
+            for c in chunks
         ]
 
         store.add(vectors, metadatas)
@@ -100,6 +122,7 @@ def build_index():
     print(f"Total vectors stored: {store.index.ntotal}")
 
 
+
 def answer_question(query: str):
     embedder = get_embedder()
     # use len() since embed returns list of floats
@@ -107,25 +130,36 @@ def answer_question(query: str):
     dim = len(embedder.embed(["test"])[0])
     store = FaissStore.load(dim)
     print("i have a store?")
-    retriever = Retriever(embedder, store, top_k=8)
+    retriever = Retriever(embedder, store, top_k=15)
     candidates = retriever.retrieve(query)
 
-    # reranker = Reranker()
-    # reranked = reranker.rerank(query, candidates, top_k=5)
-    # prompt = build_prompt(reranked, query)
+    # reranker
+    reranker = Reranker()
+    reranked = reranker.rerank(query, candidates, top_k=1)
+    prompt = build_prompt(reranked, query)
 
-    prompt = build_prompt(candidates, query)
+    # # Without reranker
+    # prompt = build_prompt(candidates, query)
     return generate_answer(prompt)
-
-
-# Example
 
 
 if __name__ == "__main__":
     # build_index()
     # print(answer_question("Explain modal jazz"))
     # answer_question("I'm gonna launch a potato and the castle over there. What should I use to launch it?")
-    # answer_question("What is the main landmark in Aurelia?")
     # answer_question("What is an eigenvalue?")
-    answer_question("What subjects pertain to having credible evidence?")
-    
+    # answer_question("What is the name of the Gym leader in Saffron City?")
+    # answer_question("What are the names of the three starter pokemon?")
+    # answer_question("Explain to me how to win in RBY.")
+    # answer_question("What is the main landmark in Aurelia?")
+    # answer_question("Does Aurelia have a king?")
+    # answer_question("When was the University of Aurelia established?")
+    # answer_question("How tall is the Helion Tower?")
+    # answer_question("What are the main sectors of Aurelia's economy?")
+    # answer_question("Who is the leader of Celadon City Gym?")
+    # answer_question("Who does Wartortle evolve into?")
+    # answer_question("Is Sabrina bad?")
+    # answer_question("Which TMs can paralyze?")
+    answer_question("What is a Charmander?")
+    # answer_question("What does focus strike do?")
+    # answer_question("What badge do I get if I beat Sabrina?")
