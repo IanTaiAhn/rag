@@ -152,4 +152,7 @@ if __name__ == "__main__":
     # answer_question("What badge do I get if I beat Sabrina?")
     # answer_question("Explain what bulbasaur is, and what does it do?")
     # answer_question("Explain how to use this product")
-    answer_question("What is the application like for this product?")
+    # answer_question("What is the application like for this product?")
+    # answer_question("What is the general idea of this document?")
+    answer_question("What sections pertain to corroborated evidence?")
+    
