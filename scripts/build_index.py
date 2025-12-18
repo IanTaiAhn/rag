@@ -154,5 +154,11 @@ if __name__ == "__main__":
     # answer_question("Explain how to use this product")
     # answer_question("What is the application like for this product?")
     # answer_question("What is the general idea of this document?")
-    answer_question("What sections pertain to corroborated evidence?")
+    # answer_question("What sections pertain to corroborated evidence?")
+    # answer_question("What does this document say about women?")
+    # answer_question("What does this document say about equal employment and disciplinary action?")
+    answer_question("What does this document say about exercise and physical requirements?")
+    # answer_question("What does this document say about promotions and raises?")
+    # answer_question("What are the new security training requirements?")
+    # answer_question("What are the expected fitness standards for generals?")
     
