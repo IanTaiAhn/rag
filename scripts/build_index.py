@@ -23,16 +23,13 @@ from embeddings.vectorstore import FaissStore
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
-
 DATA_DIR = Path("../data/raw_docs")
 INDEX_DIR = Path("vectorstore")
 
-
 def load_all_documents():
-
-    # break here TODO
     print('load docs portion: ', os.getcwd())
     docs = []
+
     for file in DATA_DIR.iterdir():
         ext = file.suffix.lower()
 
@@ -43,16 +40,12 @@ def load_all_documents():
         elif ext in [".txt", ".md"]:
             print(f"Loading text file: {file}")
             text = load_text_file(file)
-            docs.append((file, text))
 
         else:
             print(f"Skipping unsupported file: {file}")
             continue
 
-
-        # print('cleaned?: ')
-        # cleaned = load_text_file(text)
-        # docs.append((file.name, cleaned))
+        docs.append((file, text))
 
     return docs
 
@@ -64,17 +57,12 @@ def build_index():
     embed = get_embedder()
     print("embed model:", embed)
 
-    # 🔥 NEW: load tokenizer for token-accurate chunking
     model_path = "../models/qwen2.5"   # your local Qwen2.5 folder
     tokenizer = AutoTokenizer.from_pretrained(model_path)
-    # tokenizer = get_generation_tokenizer()  
-    # e.g., AutoTokenizer.from_pretrained("../models/qwen2.5")
-
-        # # GPT2 tokenizer and model
-        # tokenizer = GPT2TokenizerFast.from_pretrained(model_path)
-        # model = GPT2LMHeadModel.from_pretrained(model_path)
-
-        # Load tokenizer + model
+    # # GPT2 tokenizer and model
+    # tokenizer = GPT2TokenizerFast.from_pretrained(model_path)
+    # model = GPT2LMHeadModel.from_pretrained(model_path)
+    # Load tokenizer + model
     store = None
 
     docs = load_all_documents()
@@ -122,7 +110,6 @@ def build_index():
     print(f"Total vectors stored: {store.index.ntotal}")
 
 
-
 def answer_question(query: str):
     embedder = get_embedder()
     # use len() since embed returns list of floats
@@ -145,7 +132,7 @@ def answer_question(query: str):
 
 if __name__ == "__main__":
     # build_index()
-    # print(answer_question("Explain modal jazz"))
+    # answer_question("Explain modal jazz")
     # answer_question("I'm gonna launch a potato and the castle over there. What should I use to launch it?")
     # answer_question("What is an eigenvalue?")
     # answer_question("What is the name of the Gym leader in Saffron City?")
@@ -160,6 +147,9 @@ if __name__ == "__main__":
     # answer_question("Who does Wartortle evolve into?")
     # answer_question("Is Sabrina bad?")
     # answer_question("Which TMs can paralyze?")
-    answer_question("What is a Charmander?")
+    # answer_question("What is a Charmander?")
     # answer_question("What does focus strike do?")
     # answer_question("What badge do I get if I beat Sabrina?")
+    # answer_question("Explain what bulbasaur is, and what does it do?")
+    # answer_question("Explain how to use this product")
+    answer_question("What is the application like for this product?")
