@@ -1,7 +1,5 @@
-# ingestion/pdf_loader.py
 import pdfplumber
 from pathlib import Path
-
 
 def load_pdf_text(path: str) -> str:
     text_chunks = []
