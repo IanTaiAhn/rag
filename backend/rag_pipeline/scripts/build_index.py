@@ -6,25 +6,20 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 # --- END FIX ---
 
-import numpy as np
 from pathlib import Path
-from tqdm import tqdm
-
-from generation.generator import generate_answer
-from generation.prompt import build_prompt
-from retrieval.reranker import Reranker
-from retrieval.retriever import Retriever
 
 from ingestion.pdf_loader import load_pdf_text
 from ingestion.text_loader import load_text_file
 from chunking.chunker import chunk_text
 from embeddings.embedder import get_embedder
 from embeddings.vectorstore import FaissStore
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoTokenizer
 
+from pathlib import Path
 
-DATA_DIR = Path("../data/raw_docs")
-INDEX_DIR = Path("vectorstore")
+BASE_DIR = Path(__file__).resolve().parent.parent  # backend/rag_pipeline
+DATA_DIR = BASE_DIR / "data" / "raw_docs"
+INDEX_DIR = BASE_DIR / "vectorstore"
 
 def load_all_documents():
     print('load docs portion: ', os.getcwd())
@@ -109,6 +104,28 @@ def build_index():
     print("\nIndex build complete!")
     print(f"Total vectors stored: {store.index.ntotal}")
 
+# Global cache
+STORE = None
+EMBEDDER = None
+
+def load_index(index_name="default"):
+    global STORE, EMBEDDER
+
+    INDEX_DIR.mkdir(exist_ok=True)
+
+    print("Loading embedding model...")
+    EMBEDDER = get_embedder()
+
+    dim = len(EMBEDDER.embed(["test"])[0])
+    print(f"Embedding dimension: {dim}")
+
+    print(f"Loading FAISS index from: {INDEX_DIR}")
+    STORE = FaissStore.load(dim, path=str(INDEX_DIR))
+
+    print("Index loaded successfully!")
+    print(f"Total vectors in index: {STORE.index.ntotal}")
+
+
+
 if __name__ == "__main__":
-    # TODO I want to be able to switch indexs I use?
     build_index()

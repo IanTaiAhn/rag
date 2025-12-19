@@ -5,39 +5,23 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_PATH))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 # --- END FIX ---
-
-from pathlib import Path
-
-from generation.generator import generate_answer
-from generation.prompt import build_prompt
-from retrieval.reranker import Reranker
+from backend.rag_pipeline.scripts.build_index import STORE, EMBEDDER
 from retrieval.retriever import Retriever
+from retrieval.reranker import Reranker
+from generation.prompt import build_prompt
+from generation.generator import generate_answer
 
-from embeddings.embedder import get_embedder
-from embeddings.vectorstore import FaissStore
+def ask_question(query: str, index_name="default"):
+    if STORE is None or EMBEDDER is None:
+        raise RuntimeError("Index not loaded. Call load_index() first.")
 
-
-DATA_DIR = Path("../data/raw_docs")
-INDEX_DIR = Path("vectorstore")
-
-
-def answer_question(query: str):
-    embedder = get_embedder()
-    # use len() since embed returns list of floats
-    print('got an embedder')
-    dim = len(embedder.embed(["test"])[0])
-    store = FaissStore.load(dim)
-    print("i have a store?")
-    retriever = Retriever(embedder, store, top_k=15)
+    retriever = Retriever(EMBEDDER, STORE, top_k=15)
     candidates = retriever.retrieve(query)
 
-    # reranker
     reranker = Reranker()
     reranked = reranker.rerank(query, candidates, top_k=1)
-    prompt = build_prompt(reranked, query)
 
-    # # Without reranker
-    # prompt = build_prompt(candidates, query)
+    prompt = build_prompt(reranked, query)
     return generate_answer(prompt)
 
 if __name__ == "__main__":
@@ -72,5 +56,5 @@ if __name__ == "__main__":
     # answer_question("What are the new security training requirements?")
     # answer_question("What are the expected fitness standards for generals?")
     # answer_question("Explain to me what Trump thinks about Epstein?")
-    answer_question("What are the highlighted portions of this text?")
+    ask_question("What are the highlighted portions of this text?")
     

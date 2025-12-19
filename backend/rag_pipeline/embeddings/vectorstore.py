@@ -1,4 +1,3 @@
-# embeddings/vectorstore.py
 import os
 import faiss
 import numpy as np
