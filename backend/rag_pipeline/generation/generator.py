@@ -2,6 +2,10 @@
 import os
 from typing import List
 OPENAI = os.getenv("OPENAI_API_KEY") is not None
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent  # backend/rag_pipeline
+MODEL_DIR = BASE_DIR / "models" / "qwen2.5"
 
 if OPENAI:
     import openai
@@ -25,7 +29,7 @@ def generate_answer(prompt: str, max_tokens: int = 256):
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
         # model_path = "../models/gpt2"
-        model_path = "../models/qwen2.5"   # your local Qwen2.5 folder
+        model_path = MODEL_DIR
 
         # # GPT2 tokenizer and model
         # tokenizer = GPT2TokenizerFast.from_pretrained(model_path)

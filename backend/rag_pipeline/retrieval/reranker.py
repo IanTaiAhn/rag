@@ -1,8 +1,15 @@
 from sentence_transformers import CrossEncoder
 
+from pathlib import Path
+from sentence_transformers import CrossEncoder
+
+BASE_DIR = Path(__file__).resolve().parent.parent  # backend/rag_pipeline
+DEFAULT_MODEL_DIR = BASE_DIR / "models" / "minilm_reranker"
+
 class Reranker:
-    def __init__(self, model_path: str = "../models/minilm_reranker"):
-        self.model = CrossEncoder(model_path)
+    def __init__(self, model_path: str = DEFAULT_MODEL_DIR):
+        self.model = CrossEncoder(str(model_path))
+
 
     def rerank(self, query: str, candidates: list, top_k: int = 5):
         pairs = [(query, c['metadata']['text']) for c in candidates]

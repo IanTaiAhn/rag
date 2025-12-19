@@ -1,4 +1,5 @@
 # chunking/chunker.py
+from pathlib import Path
 import re
 from typing import List, Dict
 

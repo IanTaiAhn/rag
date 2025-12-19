@@ -1,18 +1,9 @@
-# --- FIX IMPORT PATHING ---
-import sys, os
-SCRIPT_PATH = os.path.abspath(__file__)
-PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_PATH))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-# --- END FIX ---
-
-from pathlib import Path
-
-from ingestion.pdf_loader import load_pdf_text
-from ingestion.text_loader import load_text_file
-from chunking.chunker import chunk_text
-from embeddings.embedder import get_embedder
-from embeddings.vectorstore import FaissStore
+import os
+from backend.rag_pipeline.ingestion.pdf_loader import load_pdf_text
+from backend.rag_pipeline.ingestion.text_loader import load_text_file
+from backend.rag_pipeline.chunking.chunker import chunk_text
+from backend.rag_pipeline.embeddings.embedder import get_embedder
+from backend.rag_pipeline.embeddings.vectorstore import FaissStore
 from transformers import AutoTokenizer
 
 from pathlib import Path
@@ -48,7 +39,7 @@ def load_all_documents():
 def build_index():
     INDEX_DIR.mkdir(exist_ok=True)
 
-    print("Loading embedding model...")
+    print("Loading embedding model to build index...")
     embed = get_embedder()
     print("embed model:", embed)
 
@@ -110,22 +101,24 @@ EMBEDDER = None
 
 def load_index(index_name="default"):
     global STORE, EMBEDDER
-
     INDEX_DIR.mkdir(exist_ok=True)
 
-    print("Loading embedding model...")
+    print("Loading embedding model to load index...")
     EMBEDDER = get_embedder()
 
     dim = len(EMBEDDER.embed(["test"])[0])
-    print(f"Embedding dimension: {dim}")
+    print(f"Embedding dimension from load_index in build_index: {dim}")
 
-    print(f"Loading FAISS index from: {INDEX_DIR}")
+    print(f"Loading FAISS index from load_index in build_index: {INDEX_DIR}")
     STORE = FaissStore.load(dim, path=str(INDEX_DIR))
+
+    print("STORE id from build_index: ", id(STORE))
+    print("EMBEDDER id from build_index: ", id(EMBEDDER))
 
     print("Index loaded successfully!")
     print(f"Total vectors in index: {STORE.index.ntotal}")
 
-
-
 if __name__ == "__main__":
-    build_index()
+    print('build_index passed')
+
+    # build_index()

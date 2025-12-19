@@ -1,21 +1,14 @@
-# --- FIX IMPORT PATHING ---
-import sys, os
-SCRIPT_PATH = os.path.abspath(__file__)
-PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_PATH))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-# --- END FIX ---
-from backend.rag_pipeline.scripts.build_index import STORE, EMBEDDER
-from retrieval.retriever import Retriever
-from retrieval.reranker import Reranker
-from generation.prompt import build_prompt
-from generation.generator import generate_answer
+import backend.rag_pipeline.scripts.build_index as build_index
+from backend.rag_pipeline.retrieval.retriever import Retriever
+from backend.rag_pipeline.retrieval.reranker import Reranker
+from backend.rag_pipeline.generation.prompt import build_prompt
+from backend.rag_pipeline.generation.generator import generate_answer
 
 def ask_question(query: str, index_name="default"):
-    if STORE is None or EMBEDDER is None:
+    if build_index.STORE is None or build_index.EMBEDDER is None:
         raise RuntimeError("Index not loaded. Call load_index() first.")
 
-    retriever = Retriever(EMBEDDER, STORE, top_k=15)
+    retriever = Retriever(build_index.EMBEDDER, build_index.STORE, top_k=15)
     candidates = retriever.retrieve(query)
 
     reranker = Reranker()
@@ -23,6 +16,7 @@ def ask_question(query: str, index_name="default"):
 
     prompt = build_prompt(reranked, query)
     return generate_answer(prompt)
+
 
 if __name__ == "__main__":
     # build_index()
