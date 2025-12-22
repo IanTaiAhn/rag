@@ -72,5 +72,6 @@ if __name__ == "__main__":
     # answer_question("What are the new security training requirements?")
     # answer_question("What are the expected fitness standards for generals?")
     # answer_question("Explain to me what Trump thinks about Epstein?")
-    answer_question("What are the highlighted portions of this text?")
+    # answer_question("What are the highlighted portions of this text?")
+    answer_question("What did Pete say about the Department of War")
     
