@@ -1,9 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function App() {
   const [query, setQuery] = useState("");
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [indexes, setIndexes] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState("default");
+
+  useEffect(() => {
+  fetch("http://localhost:8000/list_indexes")
+    .then(res => res.json())
+    .then(data => setIndexes(data.indexes));
+  }, []);
 
   async function askQuestion() {
     setLoading(true);
@@ -14,7 +22,7 @@ export default function App() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         query,
-        index_name: "default"
+        index_name: selectedIndex
       })
     });
 
@@ -38,7 +46,35 @@ export default function App() {
         <button onClick={askQuestion} disabled={loading}>
           {loading ? "Thinking..." : "Ask"}
         </button>
+        
+        <select
+          value={selectedIndex}
+          onChange={(e) => setSelectedIndex(e.target.value)}
+          style={{
+            marginBottom: "1rem",
+            padding: "0.5rem 0.75rem",
+            borderRadius: "6px",
+            border: "1px solid #ccc",
+            background: "#fff",
+            fontSize: "1rem",
+            cursor: "pointer",
+            outline: "none",
+            transition: "border-color 0.2s ease",
+            width: "100%",
+            maxWidth: "300px",
+            display: "block"
+          }}
+          onFocus={(e) => (e.target.style.borderColor = "#888")}
+          onBlur={(e) => (e.target.style.borderColor = "#ccc")}
+        >
+          {indexes.map((idx) => (
+            <option key={idx} value={idx}>
+              {idx}
+            </option>
+          ))}
+        </select>
 
+        
         {response && (
           <div style={{ marginTop: "2rem" }}>
             <h2>Answer</h2>

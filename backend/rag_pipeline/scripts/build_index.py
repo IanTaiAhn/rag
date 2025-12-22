@@ -11,6 +11,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent  # backend/rag_pipeline
 DATA_DIR = BASE_DIR / "data" / "raw_docs"
 INDEX_DIR = BASE_DIR / "vectorstore"
+CURRENT_DIR = Path(__file__).resolve().parent
+MODEL_DIR = CURRENT_DIR.parent / "models" / "qwen2.5"
 
 def load_all_documents():
     print('load docs portion: ', os.getcwd())
@@ -35,7 +37,6 @@ def load_all_documents():
 
     return docs
 
-
 def build_index():
     INDEX_DIR.mkdir(exist_ok=True)
 
@@ -43,15 +44,15 @@ def build_index():
     embed = get_embedder()
     print("embed model:", embed)
 
-    model_path = "../models/qwen2.5"   # your local Qwen2.5 folder
+    # local path
+    # model_path = "../models/qwen2.5"   # your local Qwen2.5 folder
+    model_path = str(MODEL_DIR)
     tokenizer = AutoTokenizer.from_pretrained(model_path)
-    # # GPT2 tokenizer and model
-    # tokenizer = GPT2TokenizerFast.from_pretrained(model_path)
-    # model = GPT2LMHeadModel.from_pretrained(model_path)
-    # Load tokenizer + model
     store = None
 
     docs = load_all_documents()
+    index_name = docs[0][0].stem
+
     print(f"Loaded {len(docs)} documents.")
 
     for doc_name, text in docs:
@@ -89,8 +90,8 @@ def build_index():
 
         store.add(vectors, metadatas)
 
-    print("\nSaving FAISS store...")
-    store.save(INDEX_DIR)
+    print("\nSaving FAISS store... from build_index into: ", INDEX_DIR)
+    store.save(INDEX_DIR, index_name)
 
     print("\nIndex build complete!")
     print(f"Total vectors stored: {store.index.ntotal}")
@@ -98,25 +99,22 @@ def build_index():
 # Global cache
 STORE = None
 EMBEDDER = None
+CURRENT_INDEX = None
 
 def load_index(index_name="default"):
     global STORE, EMBEDDER
-    INDEX_DIR.mkdir(exist_ok=True)
+    print('INDEX PATHS DIR : ',INDEX_DIR)
+    # index_dir = INDEX_ROOT  # all files live directly in vectorstore/
 
-    print("Loading embedding model to load index...")
+    # Load embedder
     EMBEDDER = get_embedder()
 
+    # Load FAISS + metadata
     dim = len(EMBEDDER.embed(["test"])[0])
-    print(f"Embedding dimension from load_index in build_index: {dim}")
-
-    print(f"Loading FAISS index from load_index in build_index: {INDEX_DIR}")
-    STORE = FaissStore.load(dim, path=str(INDEX_DIR))
-
-    print("STORE id from build_index: ", id(STORE))
-    print("EMBEDDER id from build_index: ", id(EMBEDDER))
-
-    print("Index loaded successfully!")
-    print(f"Total vectors in index: {STORE.index.ntotal}")
+    STORE = FaissStore.load(dim, path=str(INDEX_DIR), name=index_name)
+    CURRENT_INDEX = index_name
+    print('current index build_index: ', CURRENT_INDEX)
+    print(f"Loaded index build_index: {index_name}")
 
 if __name__ == "__main__":
     print('build_index passed')
