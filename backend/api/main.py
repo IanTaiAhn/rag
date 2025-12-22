@@ -1,9 +1,22 @@
-from fastapi import FastAPI
 from pydantic import BaseModel
 from backend.rag_pipeline.scripts.ask_question import ask_question
 from backend.rag_pipeline.scripts.build_index import load_index, build_index
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title="Local RAG API")
+
+# ---------------------------------------------------------
+# CORS MUST BE ADDED BEFORE ROUTES
+# ---------------------------------------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Vite dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Load default index on startup
 @app.on_event("startup")
@@ -23,7 +36,6 @@ class QueryResponse(BaseModel):
 def query_rag(request: QueryRequest):
     result = ask_question(request.query, index_name=request.index_name)
     return QueryResponse(**result)
-
 
 # @app.post("/build_index")
 # def build_index_rag(request: QueryRequest):
