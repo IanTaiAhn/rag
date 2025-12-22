@@ -47,5 +47,5 @@ def generate_answer(prompt: str, max_tokens: int = 256):
         )
 
         out = pipe(prompt, max_length=512, do_sample=False)
-        print(out[0]["generated_text"])
+        # print('print from generator.py', out[0]["generated_text"])
         return out[0]['generated_text']

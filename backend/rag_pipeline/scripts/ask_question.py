@@ -4,6 +4,28 @@ from backend.rag_pipeline.retrieval.reranker import Reranker
 from backend.rag_pipeline.generation.prompt import build_prompt
 from backend.rag_pipeline.generation.generator import generate_answer
 
+# def ask_question(query: str, index_name="default"):
+#     if build_index.STORE is None or build_index.EMBEDDER is None:
+#         raise RuntimeError("Index not loaded. Call load_index() first.")
+
+#     retriever = Retriever(build_index.EMBEDDER, build_index.STORE, top_k=15)
+#     candidates = retriever.retrieve(query)
+
+#     reranker = Reranker()
+#     reranked = reranker.rerank(query, candidates, top_k=1)
+
+#     prompt = build_prompt(reranked, query)
+#     # print('prompt from ask_question: ', prompt)
+#     # oh. so generate_answer gives me context and question...
+#     return generate_answer(prompt)
+
+def extract_answer(full_output: str) -> str:
+    # Split on the last occurrence of "Answer:"
+    if "Answer:" in full_output:
+        return full_output.split("Answer:")[-1].strip()
+    return full_output.strip()
+
+
 def ask_question(query: str, index_name="default"):
     if build_index.STORE is None or build_index.EMBEDDER is None:
         raise RuntimeError("Index not loaded. Call load_index() first.")
@@ -14,8 +36,27 @@ def ask_question(query: str, index_name="default"):
     reranker = Reranker()
     reranked = reranker.rerank(query, candidates, top_k=1)
 
+    # Build prompt
     prompt = build_prompt(reranked, query)
-    return generate_answer(prompt)
+
+    # Generate answer text (full prompt + answer)
+    full_output = generate_answer(prompt)
+
+    # Extract only the answer portion
+    answer = extract_answer(full_output)
+
+    # Extract context chunks cleanly
+    context_chunks = [
+        f"[{c['metadata'].get('doc_id','unknown')}:{c['metadata'].get('chunk_id','?')}] "
+        f"{c['metadata'].get('text') or c['metadata'].get('chunk_text') or ''}"
+        for c in reranked
+    ]
+
+    return {
+        "answer": answer,
+        "context": context_chunks,
+        "raw_output": full_output  # optional for debugging
+    }
 
 
 if __name__ == "__main__":
