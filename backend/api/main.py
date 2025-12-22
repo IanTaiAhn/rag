@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from backend.rag_pipeline.scripts.ask_question import ask_question
-from backend.rag_pipeline.scripts.build_index import load_index, build_index
+from backend.rag_pipeline.scripts.build_index import build_index
 
 from fastapi import FastAPI, HTTPException
 from fastapi import FastAPI
@@ -19,15 +19,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load default index on startup
-@app.on_event("startup")
-def startup_event():
-    # import os
-    # print(os.listdir("vectorstore"))
-    # so now I have to load the correct index, and it doesn't just always get
-    # renamed into index.faiss and meta.pkl or whatnot.
-    load_index("Blueskin-WP-200-Product-Data-2140732")
-
 class QueryRequest(BaseModel):
     query: str
     index_name: str | None = "default"
@@ -42,8 +33,6 @@ def query_rag(request: QueryRequest):
     result = ask_question(request.query, index_name=request.index_name)
     return QueryResponse(**result)
 
-from pydantic import BaseModel
-from backend.rag_pipeline.scripts.build_index import build_index
 
 class BuildIndexRequest(BaseModel):
     index_name: str | None = "default"

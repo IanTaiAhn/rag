@@ -5,7 +5,7 @@ export default function App() {
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [indexes, setIndexes] = useState([]);
-  const [selectedIndex, setSelectedIndex] = useState("default");
+  const [selectedIndex, setSelectedIndex] = useState("");
 
   useEffect(() => {
   fetch("http://localhost:8000/list_indexes")
@@ -42,11 +42,14 @@ export default function App() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-
-        <button onClick={askQuestion} disabled={loading}>
+        <button
+          onClick={askQuestion}
+          disabled={loading || !selectedIndex || !query.trim()}
+        >
           {loading ? "Thinking..." : "Ask"}
         </button>
-        
+
+
         <select
           value={selectedIndex}
           onChange={(e) => setSelectedIndex(e.target.value)}
@@ -67,11 +70,12 @@ export default function App() {
           onFocus={(e) => (e.target.style.borderColor = "#888")}
           onBlur={(e) => (e.target.style.borderColor = "#ccc")}
         >
-          {indexes.map((idx) => (
-            <option key={idx} value={idx}>
-              {idx}
-            </option>
-          ))}
+         <option value="" disabled>Select an index…</option>
+         {indexes.map((idx) => (
+           <option key={idx} value={idx}>
+             {idx}
+           </option>
+         ))}
         </select>
 
         
