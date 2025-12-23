@@ -5,6 +5,9 @@
 ### Run fast api using this command
 
 uvicorn main:app --reload --log-level debug
+
+or
+
 uvicorn backend.api.main:app --host 0.0.0.0 --port 8000 --reload
 
 ### Run frontend using vite
@@ -23,3 +26,17 @@ npm install lucide-react
 #### Do before
 
 delete package-lock.json if there and run 'npm install' for a fresh one.
+
+### Instructions to use Rag pipeline
+#### NOTE* you will need to manually install models from hugging face to use this application. look at the "rag_models_folder.png" to see which model contents you'll need.
+
+#### Hugging face models needed:
+1. https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/tree/main
+2. https://huggingface.co/cross-encoder/ms-marco-MiniLM-L6-v2/tree/main
+3. https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct/tree/main
+
+Refer to the png included in this repo named "rag_models_folder.png" to see which files are needed. 
+
+I'd suggest creating a venv and then installing the dependencies needed  using pip install -r requirements.txt
+Also, delete the package-lock.json file it exists and run npm install to get the frontend going.
+
