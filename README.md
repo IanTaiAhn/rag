@@ -4,4 +4,7 @@
 
 ##### The main branch contains code to run this locally. Reference the rag_models_folder.png to see which models are needed to run with the correct contents. They were pulled from hugging face.
 
-##### rag_api branch is currently being worked on to have this application work with the fast api library. This branch will not work locally due to the pathing changes.
+##### Run this in the terminal using either of these commands.
+uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+
+# Mostly deprecated but kept in repo to remember the good ol' days
