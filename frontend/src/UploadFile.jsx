@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function UploadDocument({ uploadedDocs, refreshUploadedDocs, refreshIndexes }) {
+export default function UploadDocument({ uploadedDocs, refreshUploadedDocs, indexes, refreshIndexes }) {
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState("");
 
@@ -34,6 +34,14 @@ export default function UploadDocument({ uploadedDocs, refreshUploadedDocs, refr
     await refreshIndexes();
   };
 
+  const handleDeleteIndex = async (indexName) => {
+    await fetch(`http://localhost:8000/delete_index/${indexName}`, {
+      method: "DELETE",
+    });
+
+    await refreshIndexes();
+  };
+  
   return (
     <div>
       <input
@@ -51,7 +59,23 @@ export default function UploadDocument({ uploadedDocs, refreshUploadedDocs, refr
         </button>
 
       <p>{status}</p>
-
+    <div>
+      <h3>Available Indexes</h3>
+      {indexes.length === 0 && <p>No indexes found</p>}
+      <ul>
+        {indexes.map((idx) => (
+          <li key={idx}>
+            {idx}
+            <button
+              style={{ marginLeft: "10px" }}
+              onClick={() => handleDeleteIndex(idx)}
+            >
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
       {/* <ul>
         {uploadedDocs.map(doc => (
           <li key={doc}>{doc}</li>

@@ -96,7 +96,7 @@ export default function App() {
         ))}
       </select>
 
-      <UploadDocument uploadedDocs={uploadedDocs} refreshUploadedDocs={fetchUploadedDocs} refreshIndexes={fetchIndexes}></UploadDocument>
+      <UploadDocument uploadedDocs={uploadedDocs} refreshUploadedDocs={fetchUploadedDocs} indexes={indexes} refreshIndexes={fetchIndexes}></UploadDocument>
 
       {response && (
         <div style={{ marginTop: "2rem" }}>
