@@ -7,6 +7,17 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [indexes, setIndexes] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState("");
+  const [uploadedDocs, setUploadedDocs] = useState([]);
+  
+    const fetchUploadedDocs = async () => {
+      const res = await fetch("http://localhost:8000/list_uploaded_docs");
+      const data = await res.json();
+      setUploadedDocs(data.files);
+    };
+    
+    useEffect(() => {
+      fetchUploadedDocs();
+    }, []);
 
   const fetchIndexes = () => {
     fetch("http://localhost:8000/list_indexes")
@@ -85,7 +96,7 @@ export default function App() {
         ))}
       </select>
 
-      <UploadDocument refreshIndexes={fetchIndexes}></UploadDocument>
+      <UploadDocument uploadedDocs={uploadedDocs} refreshUploadedDocs={fetchUploadedDocs} refreshIndexes={fetchIndexes}></UploadDocument>
 
       {response && (
         <div style={{ marginTop: "2rem" }}>

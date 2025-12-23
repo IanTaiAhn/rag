@@ -31,18 +31,15 @@ class QueryResponse(BaseModel):
     context: list[str]
     raw_output: str | None = None  # optional
 
-@app.post("/ask_question", response_model=QueryResponse)
-def query_rag(request: QueryRequest):
-    result = ask_question(request.query, index_name=request.index_name)
-    return QueryResponse(**result)
-
-
 class BuildIndexRequest(BaseModel):
     index_name: str | None = "default"
 
 class BuildIndexResponse(BaseModel):
     message: str
     index_name: str
+
+UPLOAD_DIR = Path("uploaded_docs")
+UPLOAD_DIR.mkdir(exist_ok=True)
 
 @app.post("/build_index", response_model=BuildIndexResponse)
 def api_build_index(req: BuildIndexRequest):
@@ -58,6 +55,10 @@ def api_build_index(req: BuildIndexRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/ask_question", response_model=QueryResponse)
+def query_rag(request: QueryRequest):
+    result = ask_question(request.query, index_name=request.index_name)
+    return QueryResponse(**result)
 
 @app.get("/list_indexes")
 def list_indexes():
@@ -68,10 +69,6 @@ def list_indexes():
         indexes.append(name)
 
     return {"indexes": indexes}
-
-
-UPLOAD_DIR = Path("uploaded_docs")
-UPLOAD_DIR.mkdir(exist_ok=True)
 
 @app.post("/upload_document")
 async def upload_document(file: UploadFile = File(...)):
@@ -86,6 +83,19 @@ async def upload_document(file: UploadFile = File(...)):
 
     return {"message": "File uploaded successfully", "filename": file.filename}
 
-# uploaded_docs
+@app.get("/list_uploaded_docs")
+def list_uploaded_docs():
+    files = [f.name for f in UPLOAD_DIR.glob("*") if f.is_file()]
+    return {"files": files}
+
+@app.delete("/delete_uploaded_doc/{filename}")
+def delete_uploaded_doc(filename: str):
+    file_path = UPLOAD_DIR / filename
+    if file_path.exists():
+        file_path.unlink()
+        return {"message": "File deleted"}
+    else:
+        raise HTTPException(status_code=404, detail="File not found")
+
 
 #TODO add a normal page or something

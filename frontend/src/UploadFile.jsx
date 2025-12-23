@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function UploadDocument({ refreshIndexes }) {
+export default function UploadDocument({ uploadedDocs, refreshUploadedDocs, refreshIndexes }) {
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState("");
 
@@ -17,6 +17,8 @@ export default function UploadDocument({ refreshIndexes }) {
 
     const data = await res.json();
     setStatus(data.message || "Upload complete");
+
+    await refreshUploadedDocs();
   };
 
   const handleBuildIndex = async () => {
@@ -40,10 +42,46 @@ export default function UploadDocument({ refreshIndexes }) {
         onChange={(e) => setFile(e.target.files[0])}
       />
 
-      <button onClick={handleUpload}>Upload</button>
-      <button onClick={handleBuildIndex}>Build Index</button>
+        <button onClick={handleUpload}>Upload</button>
+        <button
+          onClick={handleBuildIndex}
+          disabled={uploadedDocs.length === 0}
+        >
+          Build Index
+        </button>
 
       <p>{status}</p>
+
+      {/* <ul>
+        {uploadedDocs.map(doc => (
+          <li key={doc}>{doc}</li>
+        ))}
+      </ul> */}
+        <div>
+          <h3>Uploaded Documents</h3>
+          {uploadedDocs.length === 0 && <p>No documents uploaded</p>}
+
+          <ul>
+            {uploadedDocs.map(doc => (
+              <li key={doc}>
+                {doc}
+                <button
+                  onClick={async () => {
+                    await fetch(`http://localhost:8000/delete_uploaded_doc/${doc}`, {
+                      method: "DELETE"
+                    });
+                    refreshUploadedDocs();
+                  }}
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+
     </div>
+    
   );
 }
