@@ -9,7 +9,12 @@ from transformers import AutoTokenizer
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # backend/rag_pipeline
+FRONTEND_BASE_DIR = Path(__file__).resolve().parents[3]
+# DATA_DIR is for local file usage
 DATA_DIR = BASE_DIR / "data" / "raw_docs"
+# For frontend file uploads
+FRONTEND_DATA_DIR = FRONTEND_BASE_DIR / "uploaded_docs"
+
 INDEX_DIR = BASE_DIR / "vectorstore"
 CURRENT_DIR = Path(__file__).resolve().parent
 MODEL_DIR = CURRENT_DIR.parent / "models" / "qwen2.5"
@@ -17,8 +22,9 @@ MODEL_DIR = CURRENT_DIR.parent / "models" / "qwen2.5"
 def load_all_documents():
     print('load docs portion: ', os.getcwd())
     docs = []
-
-    for file in DATA_DIR.iterdir():
+    print('build_index load_all_documents function FRONTEND_DATA_DIR: ', FRONTEND_DATA_DIR)
+    # Switch DATA_DIR w/ FRONTEND_DATA_DIR for local or frontend usage
+    for file in FRONTEND_DATA_DIR.iterdir():
         ext = file.suffix.lower()
 
         if ext == ".pdf":
@@ -118,5 +124,4 @@ def load_index(index_name="default"):
 
 if __name__ == "__main__":
     print('build_index passed')
-
     # build_index()

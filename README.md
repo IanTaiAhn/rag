@@ -4,9 +4,14 @@
 
 ### Run fast api using this command
 
-uvicorn main:app --host 0.0.0.0 --port 8000
+uvicorn main:app --reload --log-level debug
 uvicorn backend.api.main:app --host 0.0.0.0 --port 8000 --reload
 
 ### Run frontend using vite
 
 npm run dev
+
+
+#### Work --> Personal
+Install python-multipart onto cuda.
+pip install python-multipart

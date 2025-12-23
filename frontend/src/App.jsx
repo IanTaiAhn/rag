@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import UploadDocument from "./UploadFile";
 
 export default function App() {
   const [query, setQuery] = useState("");
@@ -7,12 +8,16 @@ export default function App() {
   const [indexes, setIndexes] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState("");
 
-  useEffect(() => {
-  fetch("http://localhost:8000/list_indexes")
+  const fetchIndexes = () => {
+    fetch("http://localhost:8000/list_indexes")
     .then(res => res.json())
     .then(data => setIndexes(data.indexes));
+  };
+  
+  useEffect(() => {
+    fetchIndexes();
   }, []);
-
+  
   async function askQuestion() {
     setLoading(true);
     setResponse(null);
@@ -49,70 +54,76 @@ export default function App() {
           {loading ? "Thinking..." : "Ask"}
         </button>
 
+      <select
+        value={selectedIndex}
+        onChange={(e) => setSelectedIndex(e.target.value)}
+        style={{
+          marginBottom: "1rem",
+          padding: "0.5rem 0.75rem",
+          borderRadius: "6px",
+          border: "1px solid #ccc",
+          background: "#fff",
+          fontSize: "1rem",
+          cursor: "pointer",
+          outline: "none",
+          transition: "border-color 0.2s ease",
+          width: "100%",
+          maxWidth: "300px",
+          display: "block",
+          color: "#222" // <-- darker text
+        }}
+        onFocus={(e) => (e.target.style.borderColor = "#888")}
+        onBlur={(e) => (e.target.style.borderColor = "#ccc")}
+      >
+        <option value="" disabled style={{ color: "#555" }}>
+          Select an index…
+        </option>
+        {indexes.map((idx) => (
+          <option key={idx} value={idx} style={{ color: "#222" }}>
+            {idx}
+          </option>
+        ))}
+      </select>
 
-        <select
-          value={selectedIndex}
-          onChange={(e) => setSelectedIndex(e.target.value)}
-          style={{
-            marginBottom: "1rem",
-            padding: "0.5rem 0.75rem",
-            borderRadius: "6px",
-            border: "1px solid #ccc",
-            background: "#fff",
-            fontSize: "1rem",
-            cursor: "pointer",
-            outline: "none",
-            transition: "border-color 0.2s ease",
-            width: "100%",
-            maxWidth: "300px",
-            display: "block"
-          }}
-          onFocus={(e) => (e.target.style.borderColor = "#888")}
-          onBlur={(e) => (e.target.style.borderColor = "#ccc")}
-        >
-         <option value="" disabled>Select an index…</option>
-         {indexes.map((idx) => (
-           <option key={idx} value={idx}>
-             {idx}
-           </option>
-         ))}
-        </select>
+      <UploadDocument refreshIndexes={fetchIndexes}></UploadDocument>
 
-        
-        {response && (
-          <div style={{ marginTop: "2rem" }}>
-            <h2>Answer</h2>
-            <p>{response.answer}</p>
-        
-            <h2>Context Used</h2>
-            {response.context?.map((chunk, i) => (
-              <div
-                key={i}
+      {response && (
+        <div style={{ marginTop: "2rem" }}>
+          <h2>Answer</h2>
+          <p>{response.answer}</p>
+      
+          <h2>Context Used</h2>
+          {response.context?.map((chunk, i) => (
+            <div
+              key={i}
+              style={{
+                marginBottom: "1rem",
+                padding: "1rem",
+                background: "#f4f4f4",
+                borderRadius: "6px",
+                overflowWrap: "break-word",
+                wordBreak: "break-word",
+                maxWidth: "100%",
+                color: "#222" // <-- darker text for the whole block
+              }}
+            >
+              <pre
                 style={{
-                  marginBottom: "1rem",
-                  padding: "1rem",
-                  background: "#f4f4f4",
-                  borderRadius: "6px",
+                  whiteSpace: "pre-wrap",
                   overflowWrap: "break-word",
                   wordBreak: "break-word",
-                  maxWidth: "100%"
+                  margin: 0,
+                  maxWidth: "100%",
+                  color: "#222" // <-- ensure pre text is dark
                 }}
               >
-                <pre
-                  style={{
-                    whiteSpace: "pre-wrap",   // allows wrapping
-                    overflowWrap: "break-word",
-                    wordBreak: "break-word",
-                    margin: 0,
-                    maxWidth: "100%"
-                  }}
-                >
-                  {chunk}
-                </pre>
-              </div>
-            ))}
-          </div>
-        )}
+                {chunk}
+              </pre>
+            </div>
+          ))}
+        </div>
+      )}
+
       </div>
   );
 }

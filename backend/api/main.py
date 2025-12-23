@@ -1,7 +1,10 @@
 from pydantic import BaseModel
 from backend.rag_pipeline.scripts.ask_question import ask_question
 from backend.rag_pipeline.scripts.build_index import build_index
+from backend.rag_pipeline.scripts.build_index import INDEX_DIR
 
+from pathlib import Path
+from fastapi import UploadFile, File, HTTPException
 from fastapi import FastAPI, HTTPException
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -55,9 +58,6 @@ def api_build_index(req: BuildIndexRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-from fastapi import FastAPI
-
-from backend.rag_pipeline.scripts.build_index import INDEX_DIR
 
 @app.get("/list_indexes")
 def list_indexes():
@@ -70,7 +70,22 @@ def list_indexes():
     return {"indexes": indexes}
 
 
+UPLOAD_DIR = Path("uploaded_docs")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+@app.post("/upload_document")
+async def upload_document(file: UploadFile = File(...)):
+    if file.content_type not in ["application/pdf", "text/plain"]:
+        raise HTTPException(status_code=400, detail="Only PDF or TXT files allowed")
+
+    file_path = UPLOAD_DIR / file.filename
+
+    # Save file
+    with open(file_path, "wb") as f:
+        f.write(await file.read())
+
+    return {"message": "File uploaded successfully", "filename": file.filename}
+
+# uploaded_docs
+
 #TODO add a normal page or something
-
-#TODO make it so that we can query the code that triggers build_index
-
