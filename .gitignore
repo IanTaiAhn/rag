@@ -1,3 +1,5 @@
 backend/rag_pipeline/models/minilm
 backend/rag_pipeline/models/minilm_reranker
 backend/rag_pipeline/models/qwen2.5
+
+package-lock.json

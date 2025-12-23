@@ -13,5 +13,12 @@ npm run dev
 
 
 #### Work --> Personal
+
 Install python-multipart onto cuda.
+If App2 works you need lucide-react
 pip install python-multipart
+npm install lucide-react
+
+#### Do before
+
+delete package-lock.json if there and run 'npm install' for a fresh one.
