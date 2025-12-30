@@ -1,1 +1,0 @@
-### Frontend for the local RAG pipeline.
