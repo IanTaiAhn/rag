@@ -10,7 +10,7 @@ Despite its small footprint, the pipeline delivers strong retrieval quality and 
 
 ## Demo Video
 
-<video controls src="rag_demo-1.mp4" title="Title"></video>
+https://github.com/user-attachments/assets/d75d5c9b-d949-4678-b4fa-9953aef90db2
 
 ### Running the Backend (FastAPI)
 
