@@ -8,6 +8,10 @@ MiniLM‑L6‑v2 for both sentence embeddings and cross‑encoder reranking
 
 Despite its small footprint, the pipeline delivers strong retrieval quality and responsive generation on modest hardware.
 
+## Demo Video
+
+https://github.com/IanTaiAhn/rag/blob/main/rag_demo.mp4
+
 ### Running the Backend (FastAPI)
 
 You can start the API using either command:
