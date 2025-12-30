@@ -1,0 +1,12 @@
+backend/rag_pipeline/models/minilm
+backend/rag_pipeline/models/minilm_reranker
+backend/rag_pipeline/models/qwen2.5
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+
+package-lock.json
