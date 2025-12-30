@@ -80,7 +80,6 @@ export default function RAGDemo() {
     }
   };
 
-// TODO  Might be broken here...
   const handleBuildIndex = async () => {
     setStatus('Building index...');
     setStatusType('info');
