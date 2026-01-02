@@ -45,21 +45,20 @@ def load_all_documents():
 
     return docs
 
-# TODO HF API Integration
 def build_index():
     INDEX_DIR.mkdir(exist_ok=True)
 
     print("Loading embedding model to build index...")
     embed = get_embedder()
-    print("embed model:", embed)
 
-    # local path
-    # model_path = "../models/qwen2.5"   # your local Qwen2.5 folder
-    model_path = str(MODEL_DIR)
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    # Load Qwen2.5 tokenizer from HF Hub (no model weights downloaded)
+    tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-1.5B")
+
     store = None
-
     docs = load_all_documents()
+    if not docs:
+        raise RuntimeError("No documents found in uploaded_docs/. Cannot build index.")
+
     index_name = docs[0][0].stem
 
     print(f"Loaded {len(docs)} documents.")
@@ -67,7 +66,6 @@ def build_index():
     for doc_name, text in docs:
         print(f"\nChunking {doc_name}...")
 
-        # Pass tokenizer into chunk_text
         chunks = chunk_text(
             text,
             tokenizer=tokenizer,
@@ -81,13 +79,11 @@ def build_index():
         print(f"Embedding {len(chunk_texts)} chunks...")
 
         vectors = embed.embed(chunk_texts)
-        print("vectors type:", type(vectors))
 
         if store is None:
             dim = len(vectors[0])
             store = FaissStore(dim)
 
-        # store the actual chunk text, not the whole dict
         metadatas = [
             {
                 "doc_name": doc_name,
@@ -99,11 +95,12 @@ def build_index():
 
         store.add(vectors, metadatas)
 
-    print("\nSaving FAISS store... from build_index into: ", INDEX_DIR)
+    print("\nSaving FAISS store...")
     store.save(INDEX_DIR, index_name)
 
     print("\nIndex build complete!")
     print(f"Total vectors stored: {store.index.ntotal}")
+
 
 # Global cache
 STORE = None
