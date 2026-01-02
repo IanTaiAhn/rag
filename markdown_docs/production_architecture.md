@@ -63,3 +63,23 @@ Given your goal of **demonstrating production ML deployment**, this architecture
 - No surprise cloud costs
 - A clean, modern deployment story
 - High confidence when discussing design decisions in interviews
+
+
+Final Architecture Diagram (Potential)
+┌──────────────────────────┐
+│        React UI          │
+│  (Vercel / Netlify)      │
+└───────────┬──────────────┘
+            │ HTTPS
+            ▼
+┌──────────────────────────┐
+│      FastAPI Backend     │
+│  (Fly.io / Railway)      │
+│  Dockerized              │
+└───────────┬──────────────┘
+            │
+     ┌──────┼────────┬──────────────┐
+     │      │        │              │
+     ▼      ▼        ▼              ▼
+HF Emb.   HF LLM   Qdrant DB     S3/R2 Storage
+API       API      (free tier)   (optional)

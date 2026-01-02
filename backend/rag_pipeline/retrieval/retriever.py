@@ -2,7 +2,7 @@
 from typing import List, Dict
 import numpy as np
 
-
+# Jk this is used in the Retriever Class
 def mmr(ranked_list, query_embedding, lambda_mult=0.7, top_k=5):
     # very small MMR implementation wrapper for metadata list
     # ranked_list: list of dict {"embedding": , "metadata": }

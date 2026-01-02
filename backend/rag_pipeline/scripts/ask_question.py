@@ -4,21 +4,8 @@ from backend.rag_pipeline.retrieval.reranker import Reranker
 from backend.rag_pipeline.generation.prompt import build_prompt
 from backend.rag_pipeline.generation.generator import generate_answer
 
-# def ask_question(query: str, index_name="default"):
-#     if build_index.STORE is None or build_index.EMBEDDER is None:
-#         raise RuntimeError("Index not loaded. Call load_index() first.")
 
-#     retriever = Retriever(build_index.EMBEDDER, build_index.STORE, top_k=15)
-#     candidates = retriever.retrieve(query)
-
-#     reranker = Reranker()
-#     reranked = reranker.rerank(query, candidates, top_k=1)
-
-#     prompt = build_prompt(reranked, query)
-#     # print('prompt from ask_question: ', prompt)
-#     # oh. so generate_answer gives me context and question...
-#     return generate_answer(prompt)
-
+# TODO HF API Integrate? Actually possibly not here.
 def extract_answer(full_output: str) -> str:
     # Split on the last occurrence of "Answer:"
     if "Answer:" in full_output:
@@ -90,7 +77,7 @@ def ask_question(query: str, index_name="default"):
 #     }
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # build_index()
     # answer_question("Explain modal jazz")
     # answer_question("I'm gonna launch a potato and the castle over there. What should I use to launch it?")
@@ -121,6 +108,5 @@ if __name__ == "__main__":
     # answer_question("What does this document say about promotions and raises?")
     # answer_question("What are the new security training requirements?")
     # answer_question("What are the expected fitness standards for generals?")
-    # answer_question("Explain to me what Trump thinks about Epstein?")
-    ask_question("What are the highlighted portions of this text?")
+    # ask_question("What are the highlighted portions of this text?")
     

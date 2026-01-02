@@ -1,8 +1,9 @@
 # generation/generator.py
 import os
-from typing import List
-OPENAI = os.getenv("OPENAI_API_KEY") is not None
 from pathlib import Path
+# from typing import List
+
+OPENAI = os.getenv("OPENAI_API_KEY") is not None
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # backend/rag_pipeline
 MODEL_DIR = BASE_DIR / "models" / "qwen2.5"
@@ -10,7 +11,7 @@ MODEL_DIR = BASE_DIR / "models" / "qwen2.5"
 if OPENAI:
     import openai
 
-
+# TODO HF API Integration
 def generate_answer(prompt: str, max_tokens: int = 256):
     if OPENAI:
         model = os.getenv('OPENAI_COMPLETION_MODEL', 'gpt-4o-mini')

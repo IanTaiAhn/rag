@@ -1,14 +1,14 @@
 # embeddings/embedder.py
 import os
 from typing import List
+from sentence_transformers import SentenceTransformer
+
 
 OPENAI = os.getenv("OPENAI_API_KEY") is not None
-
 
 class BaseEmbedder:
     def embed(self, texts: List[str]) -> List[List[float]]:
         raise NotImplementedError
-
 
 if OPENAI:
     import openai
@@ -22,20 +22,8 @@ if OPENAI:
             res = openai.Embedding.create(model=self.model, input=texts)
             return [r['embedding'] for r in res['data']]
 
-
-# fallback: sentence-transformers
-from sentence_transformers import SentenceTransformer
-
-
-# class SentenceTransformerEmbedder(BaseEmbedder):
-#     def __init__(self, model_name: str = None):
-#         self.model_name = model_name or os.getenv("SENT_TRANSFORMER_MODEL", "all-MiniLM-L6-v2")
-#         self.model = SentenceTransformer(self.model_name)
-
-#     def embed(self, texts: List[str]):
-#         return self.model.encode(texts, show_progress_bar=False, convert_to_numpy=True).tolist()
-
 # loaded it in locally.
+# TODO Change to HF API
 class SentenceTransformerEmbedder(BaseEmbedder):
     def __init__(self, model_name: str = None):
         print('os from embedder.py: ', os.getcwd())

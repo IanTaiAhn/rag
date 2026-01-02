@@ -10,8 +10,10 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # backend/rag_pipeline
 FRONTEND_BASE_DIR = Path(__file__).resolve().parents[3]
+
 # DATA_DIR is for local file usage
 DATA_DIR = BASE_DIR / "data" / "raw_docs"
+
 # For frontend file uploads
 FRONTEND_DATA_DIR = FRONTEND_BASE_DIR / "uploaded_docs"
 
@@ -43,6 +45,7 @@ def load_all_documents():
 
     return docs
 
+# TODO HF API Integration
 def build_index():
     INDEX_DIR.mkdir(exist_ok=True)
 

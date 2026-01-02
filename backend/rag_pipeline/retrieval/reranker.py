@@ -6,6 +6,8 @@ from sentence_transformers import CrossEncoder
 BASE_DIR = Path(__file__).resolve().parent.parent  # backend/rag_pipeline
 DEFAULT_MODEL_DIR = BASE_DIR / "models" / "minilm_reranker"
 
+
+# TODO HF API Integration
 class Reranker:
     def __init__(self, model_path: str = DEFAULT_MODEL_DIR):
         self.model = CrossEncoder(str(model_path))
