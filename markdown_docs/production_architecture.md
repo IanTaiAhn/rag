@@ -83,3 +83,27 @@ Final Architecture Diagram (Potential)
      ▼      ▼        ▼              ▼
 HF Emb.   HF LLM   Qdrant DB     S3/R2 Storage
 API       API      (free tier)   (optional)
+
+
+## DOCKER HELP
+Build the image:
+
+bash:
+
+docker build -t rag-backend .
+
+Run it:
+
+bash:
+
+docker run -p 8000:8000 --env-file .env rag-backend
+
+Or with docker-compose:
+
+bash:
+
+docker-compose up --build
+
+Your API is now live at:
+
+http://localhost:8000
