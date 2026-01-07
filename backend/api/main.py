@@ -9,14 +9,17 @@ from fastapi import FastAPI, HTTPException
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Local RAG API")
+app = FastAPI(title="Prod RAG API")
 
 # ---------------------------------------------------------
 # CORS MUST BE ADDED BEFORE ROUTES
 # ---------------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite dev server
+    allow_origins=["http://localhost:5173",
+                   "https://iantaiahn.github.io",
+                   "https://iantaiahn.github.io/rag/"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

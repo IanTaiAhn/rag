@@ -12,9 +12,14 @@ export default function RAGDemo() {
   const [status, setStatus] = useState('');
   const [statusType, setStatusType] = useState('info');
 
+  const API_BASE = "https://rag-q1tl.onrender.com";
+
+`${API_BASE}/ask_question`
+
+
   const fetchIndexes = async () => {
     try {
-      const res = await fetch('http://localhost:8000/list_indexes');
+      const res = await fetch(`${API_BASE}/list_indexes`);
       const data = await res.json();
       setIndexes(data.indexes || []);
     } catch (err) {
@@ -24,7 +29,7 @@ export default function RAGDemo() {
 
   const fetchUploadedDocs = async () => {
     try {
-      const res = await fetch('http://localhost:8000/list_uploaded_docs');
+      const res = await fetch(`${API_BASE}/list_uploaded_docs`);
       const data = await res.json();
       setUploadedDocs(data.files || []);
     } catch (err) {
@@ -42,7 +47,7 @@ export default function RAGDemo() {
     
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/ask_question', {
+      const res = await fetch(`${API_BASE}/ask_question`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query, index_name: selectedIndex })
@@ -66,7 +71,7 @@ export default function RAGDemo() {
     setStatusType('info');
     
     try {
-      await fetch('http://localhost:8000/upload_document', {
+      await fetch(`${API_BASE}/upload_document`, {
         method: 'POST',
         body: formData
       });
@@ -85,7 +90,7 @@ export default function RAGDemo() {
     setStatusType('info');
     
     try {
-      const res = await fetch("http://localhost:8000/build_index", {
+      const res = await fetch(`${API_BASE}/build_index`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ index_name: "default" }),
@@ -104,7 +109,7 @@ export default function RAGDemo() {
 
   const handleDeleteIndex = async (indexName) => {
     try {
-      await fetch(`http://localhost:8000/delete_index/${indexName}`, {
+      await fetch(`${API_BASE}/delete_index/${indexName}`, {
         method: 'DELETE'
       });
       if (selectedIndex === indexName) setSelectedIndex('');
@@ -117,7 +122,7 @@ export default function RAGDemo() {
 
   const handleDeleteDoc = async (docName) => {
     try {
-      await fetch(`http://localhost:8000/delete_uploaded_doc/${docName}`, {
+      await fetch(`${API_BASE}/delete_uploaded_doc/${docName}`, {
         method: 'DELETE'
       });
       fetchUploadedDocs();
