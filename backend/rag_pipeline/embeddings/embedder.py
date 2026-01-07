@@ -2,7 +2,6 @@ import os
 from typing import List
 import requests
 
-# OPENAI = os.getenv("OPENAI_API_KEY") is not None
 HF_API_KEY = os.getenv("HF_API_KEY")
 
 
@@ -12,26 +11,11 @@ class BaseEmbedder:
 
 
 # -------------------------
-# OpenAI embedder (unchanged)
-# -------------------------
-# if OPENAI:
-#     import openai
-
-#     class OpenAIEmbedder(BaseEmbedder):
-#         def __init__(self, model: str = None):
-#             self.model = model or os.getenv("OPENAI_EMBEDDING_MODEL")
-
-#         def embed(self, texts: List[str]):
-#             res = openai.Embedding.create(model=self.model, input=texts)
-#             return [r["embedding"] for r in res["data"]]
-
-
-# -------------------------
 # Hugging Face API embedder
 # -------------------------
 class HuggingFaceEmbedder(BaseEmbedder):
     """
-    Uses Hugging Face Router API for embeddings.
+    Uses Hugging Face Inference API for embeddings.
     """
 
     def __init__(self, model_name: str = None):
@@ -44,24 +28,25 @@ class HuggingFaceEmbedder(BaseEmbedder):
             "sentence-transformers/all-MiniLM-L6-v2"
         )
 
-        # NEW router endpoint
-        self.api_url = "https://router.huggingface.co/embed"
+        # Correct Inference API endpoint (model-addressed)
+        self.api_url = f"https://api-inference.huggingface.co/models/{self.model_name}"
 
         self.headers = {
             "Authorization": f"Bearer {HF_API_KEY}",
             "Content-Type": "application/json"
         }
-        
+
         print(">>> Using embedding model:", self.model_name)
         print(">>> HF API URL:", self.api_url)
 
-    def embed(self, texts: List[str]):
+    def embed(self, texts: List[str]) -> List[List[float]]:
         """
-        Uses the new HF Router Embeddings API.
+        Calls the Hugging Face Inference API for feature extraction (embeddings).
         """
+
+        # HF accepts either a single string or a list of strings
         payload = {
-            "inputs": texts,
-            "model": self.model_name
+            "inputs": texts
         }
 
         response = requests.post(self.api_url, headers=self.headers, json=payload)
@@ -72,41 +57,23 @@ class HuggingFaceEmbedder(BaseEmbedder):
             )
 
         data = response.json()
-        # Used to return as this so will watch this...
-        # return response.json()
 
-        # HF returns: {"embeddings": [[...], [...], ...]}
-        return data["embeddings"]
- 
+        # Response format:
+        # - Single input: [dim]
+        # - Batch input: [[dim], [dim], ...]
+        if isinstance(data, list) and isinstance(data[0], list):
+            return data
+        elif isinstance(data, list):
+            return [data]
+        else:
+            raise RuntimeError(f"Unexpected HuggingFace response format: {data}")
 
 
 # -------------------------
 # Embedder factory
 # -------------------------
 def get_embedder():
-    # if OPENAI:
-    #     return OpenAIEmbedder()
-
-    # Prefer HF API over local models
     if HF_API_KEY:
         return HuggingFaceEmbedder()
-
-    # Fallback: local model (legacy)
-    # from sentence_transformers import SentenceTransformer
-
-    # class SentenceTransformerEmbedder(BaseEmbedder):
-    #     def __init__(self, model_name: str = None):
-    #         self.model_name = model_name or os.getenv(
-    #             "SENT_TRANSFORMER_MODEL",
-    #             "backend/rag_pipeline/models/minilm"
-    #         )
-    #         self.model = SentenceTransformer(self.model_name)
-
-    #     def embed(self, texts: List[str]):
-    #         return self.model.encode(
-    #             texts,
-    #             show_progress_bar=False,
-    #             convert_to_numpy=True
-    #         ).tolist()
-
-    # return SentenceTransformerEmbedder()
+    else:
+        raise ValueError("No embedding backend configured.")
