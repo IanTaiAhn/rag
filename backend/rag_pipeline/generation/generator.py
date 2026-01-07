@@ -2,7 +2,6 @@ import os
 import requests
 from pathlib import Path
 
-# OPENAI = os.getenv("OPENAI_API_KEY") is not None
 HF_API_KEY = os.getenv("HF_API_KEY")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,10 +36,7 @@ def generate_answer(prompt: str, max_tokens: int = 256):
 
         data = response.json()
 
-        # HF router returns OpenAI-style responses
         return data["choices"][0]["message"]["content"]
-        # HF used to return like this...
-        # return data[0]["generated_text"]
 
     # -------------------------
     # 3. Local fallback

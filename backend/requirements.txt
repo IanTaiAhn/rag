@@ -43,3 +43,4 @@ urllib3==2.6.2
 tqdm==4.67.1
 
 python-multipart==0.0.9
+sentence-transformers==3.0.1
