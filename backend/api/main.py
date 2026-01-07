@@ -9,6 +9,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import traceback
+
 app = FastAPI(title="Prod RAG API")
 
 # ---------------------------------------------------------
@@ -55,12 +57,17 @@ def api_build_index(req: BuildIndexRequest):
         # If your build_index() function needs the index name,
         # modify it to accept a parameter. For now, we assume
         # it builds into INDEX_DIR based on index_name.
-        build_index()  
+        # build_index()  
+        print(">>> Starting build_index()") 
+        result = build_index() 
+        print(">>> build_index() completed:", result)
         return BuildIndexResponse(
             message="Index built successfully",
             index_name=req.index_name
         )
     except Exception as e:
+        print(">>> ERROR in build_index():")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/delete_index/{index_name}")
