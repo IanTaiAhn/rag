@@ -31,27 +31,35 @@ class BaseEmbedder:
 # -------------------------
 class HuggingFaceEmbedder(BaseEmbedder):
     """
-    Uses Hugging Face Inference API for embeddings.
+    Uses Hugging Face Router API for embeddings.
     """
 
     def __init__(self, model_name: str = None):
         if HF_API_KEY is None:
             raise ValueError("HF_API_KEY environment variable is required for HuggingFaceEmbedder")
 
-        # Default to a MiniLM embedding model
+        # Default embedding model
         self.model_name = model_name or os.getenv(
             "HF_EMBEDDING_MODEL",
             "sentence-transformers/all-MiniLM-L6-v2"
         )
 
-        self.api_url = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{self.model_name}"
-        self.headers = {"Authorization": f"Bearer {HF_API_KEY}"}
+        # NEW router endpoint
+        self.api_url = "https://router.huggingface.co/embed"
+
+        self.headers = {
+            "Authorization": f"Bearer {HF_API_KEY}",
+            "Content-Type": "application/json"
+        }
 
     def embed(self, texts: List[str]):
         """
-        HF API accepts a list of strings and returns a list of embeddings.
+        Uses the new HF Router Embeddings API.
         """
-        payload = {"inputs": texts}
+        payload = {
+            "inputs": texts,
+            "model": self.model_name
+        }
 
         response = requests.post(self.api_url, headers=self.headers, json=payload)
 
@@ -60,7 +68,13 @@ class HuggingFaceEmbedder(BaseEmbedder):
                 f"HuggingFace API error {response.status_code}: {response.text}"
             )
 
-        return response.json()
+        data = response.json()
+        # Used to return as this so will watch this...
+        # return response.json()
+
+        # HF returns: {"embeddings": [[...], [...], ...]}
+        return data["embeddings"]
+ 
 
 
 # -------------------------
