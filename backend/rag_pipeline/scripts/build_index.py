@@ -8,20 +8,46 @@ from transformers import AutoTokenizer
 
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent  # backend/rag_pipeline
-UPLOAD_DIR = Path(__file__).resolve().parent.parent / "uploaded_docs"
 
-# FRONTEND_BASE_DIR = Path(__file__).resolve().parents[3]
+# ---------------------------------------------
+# Resolve backend root directory
+# build_index.py lives at:
+# backend/rag_pipeline/scripts/build_index.py
+# So parents[2] = backend/
+# ---------------------------------------------
+BACKEND_ROOT = Path(__file__).resolve().parents[2]
 
-# DATA_DIR is for local file usage
-DATA_DIR = BASE_DIR / "data" / "raw_docs"
+# Directory where FastAPI stores uploaded files
+UPLOAD_DIR = BACKEND_ROOT / "uploaded_docs"
+UPLOAD_DIR.mkdir(exist_ok=True)
 
-# For frontend file uploads
+# Local raw docs (optional)
+DATA_DIR = BACKEND_ROOT / "rag_pipeline" / "data" / "raw_docs"
+
+# Use uploaded docs for index building
 FRONTEND_DATA_DIR = UPLOAD_DIR
 
-INDEX_DIR = BASE_DIR / "vectorstore"
+# Vectorstore directory
+INDEX_DIR = BACKEND_ROOT / "rag_pipeline" / "vectorstore"
+INDEX_DIR.mkdir(exist_ok=True)
+
 CURRENT_DIR = Path(__file__).resolve().parent
-MODEL_DIR = CURRENT_DIR.parent / "models" / "qwen2.5"
+MODEL_DIR = BACKEND_ROOT / "rag_pipeline" / "models" / "qwen2.5"
+
+# BASE_DIR = Path(__file__).resolve().parent.parent  # backend/rag_pipeline
+# UPLOAD_DIR = Path(__file__).resolve().parent.parent / "uploaded_docs"
+
+# # FRONTEND_BASE_DIR = Path(__file__).resolve().parents[3]
+
+# # DATA_DIR is for local file usage
+# DATA_DIR = BASE_DIR / "data" / "raw_docs"
+
+# # For frontend file uploads
+# FRONTEND_DATA_DIR = UPLOAD_DIR
+
+# INDEX_DIR = BASE_DIR / "vectorstore"
+# CURRENT_DIR = Path(__file__).resolve().parent
+# MODEL_DIR = CURRENT_DIR.parent / "models" / "qwen2.5"
 
 def load_all_documents():
     print('load docs portion: ', os.getcwd())

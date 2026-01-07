@@ -43,8 +43,8 @@ class BuildIndexResponse(BaseModel):
     message: str
     index_name: str
 
-# UPLOAD_DIR = Path("uploaded_docs")
-UPLOAD_DIR = Path(__file__).resolve().parent.parent / "uploaded_docs"
+BACKEND_ROOT = Path(__file__).resolve().parent.parent 
+UPLOAD_DIR = BACKEND_ROOT / "uploaded_docs" 
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 @app.post("/ask_question", response_model=QueryResponse)
