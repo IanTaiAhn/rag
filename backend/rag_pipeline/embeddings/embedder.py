@@ -51,6 +51,9 @@ class HuggingFaceEmbedder(BaseEmbedder):
             "Authorization": f"Bearer {HF_API_KEY}",
             "Content-Type": "application/json"
         }
+        
+        print(">>> Using embedding model:", self.model_name)
+        print(">>> HF API URL:", self.api_url)
 
     def embed(self, texts: List[str]):
         """
