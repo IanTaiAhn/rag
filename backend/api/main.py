@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-from backend.rag_pipeline.scripts.ask_question import ask_question
-from backend.rag_pipeline.scripts.build_index import build_index
-from backend.rag_pipeline.scripts.build_index import INDEX_DIR
+from rag_pipeline.scripts.ask_question import ask_question
+from rag_pipeline.scripts.build_index import build_index
+from rag_pipeline.scripts.build_index import INDEX_DIR
 
 from pathlib import Path
 from fastapi import UploadFile, File, HTTPException

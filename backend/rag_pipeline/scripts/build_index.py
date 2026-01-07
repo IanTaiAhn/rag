@@ -1,9 +1,9 @@
 import os
-from backend.rag_pipeline.ingestion.pdf_loader import load_pdf_text
-from backend.rag_pipeline.ingestion.text_loader import load_text_file
-from backend.rag_pipeline.chunking.chunker import chunk_text
-from backend.rag_pipeline.embeddings.embedder import get_embedder
-from backend.rag_pipeline.embeddings.vectorstore import FaissStore
+from rag_pipeline.ingestion.pdf_loader import load_pdf_text
+from rag_pipeline.ingestion.text_loader import load_text_file
+from rag_pipeline.chunking.chunker import chunk_text
+from rag_pipeline.embeddings.embedder import get_embedder
+from rag_pipeline.embeddings.vectorstore import FaissStore
 from transformers import AutoTokenizer
 
 from pathlib import Path

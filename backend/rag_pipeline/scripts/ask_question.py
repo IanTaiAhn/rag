@@ -1,8 +1,8 @@
-import backend.rag_pipeline.scripts.build_index as build_index
-from backend.rag_pipeline.retrieval.retriever import Retriever
-from backend.rag_pipeline.retrieval.reranker import Reranker
-from backend.rag_pipeline.generation.prompt import build_prompt
-from backend.rag_pipeline.generation.generator import generate_answer
+import rag_pipeline.scripts.build_index as build_index
+from rag_pipeline.retrieval.retriever import Retriever
+from rag_pipeline.retrieval.reranker import Reranker
+from rag_pipeline.generation.prompt import build_prompt
+from rag_pipeline.generation.generator import generate_answer
 
 
 def extract_answer(full_output: str) -> str:
