@@ -90,3 +90,13 @@ Takeaway: Ideal for local RAG development. GPU acceleration provides a major boo
 The pipeline handles documents up to ~35 pages smoothly, which is the largest size tested so far. Performance remains stable during indexing and querying at this scale.
 
 However, when working with significantly larger documents, you may notice increased latency during queries. This slowdown is expected, as larger indexes require more time for retrieval and reranking.
+
+
+### TODO for prod
+
+Try to implement these reranker/embedding models instead:
+
+* Jina Embeddings v3 (free, high quality), https://huggingface.co/jinaai/jina-embeddings-v3
+* Jina Reranker v1 (free, cross‑encoder quality), https://huggingface.co/jinaai/jina-reranker-v1-turbo-en
+* Remove sentence_transformers if possible and use only api calls.
+* example api call? POST https://api.jina.ai/v1/embeddings
