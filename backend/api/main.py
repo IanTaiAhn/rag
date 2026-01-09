@@ -9,9 +9,34 @@ from fastapi import FastAPI, HTTPException
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import os
+import httpx
+import asyncio
+from contextlib import asynccontextmanager
+
 import traceback
 
-app = FastAPI(title="Prod RAG API")
+async def warm_up_jina():
+    """Warm up DNS, TLS, and HTTP connection to Jina before real work."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.head(
+                "https://api.jina.ai/v1/embeddings",
+                headers={"Authorization": f"Bearer {os.getenv('JINA_API_KEY')}"}
+            )
+        print("Jina warm-up successful")
+    except Exception as e:
+        # Cold starts often fail on the first attempt — this is expected.
+        print("Jina warm-up failed (cold start expected):", e)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Runs when the container wakes up or the server starts
+    await warm_up_jina()
+    yield
+    # No shutdown logic needed, but you could add cleanup here if needed
+
+app = FastAPI(title="Prod RAG API", lifespan=lifespan)
 
 # ---------------------------------------------------------
 # CORS MUST BE ADDED BEFORE ROUTES
@@ -53,14 +78,15 @@ def query_rag(request: QueryRequest):
     return QueryResponse(**result)
 
 @app.post("/build_index", response_model=BuildIndexResponse)
-def api_build_index(req: BuildIndexRequest):
+async def api_build_index(req: BuildIndexRequest):
     try:
-        # If your build_index() function needs the index name,
-        # modify it to accept a parameter. For now, we assume
-        # it builds into INDEX_DIR based on index_name.
-        # build_index()  
-        print(">>> Starting build_index()") 
-        result = build_index() 
+        print(">>> Warming up Jina…")
+        await warm_up_jina()   # <-- integrate here
+
+        print(">>> Starting build_index()")
+        result = await build_index()   # if build_index is async
+        # or: result = build_index()   # if it's sync
+
         print(">>> build_index() completed:", result)
         return BuildIndexResponse(
             message="Index built successfully",
@@ -70,6 +96,25 @@ def api_build_index(req: BuildIndexRequest):
         print(">>> ERROR in build_index():")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+# OLD BUILD_INDEX
+# @app.post("/build_index", response_model=BuildIndexResponse)
+# def api_build_index(req: BuildIndexRequest):
+#     try:
+#         # If your build_index() function needs the index name,
+#         # modify it to accept a parameter. For now, we assume
+#         # it builds into INDEX_DIR based on index_name.
+#         # build_index()  
+#         print(">>> Starting build_index()") 
+#         result = build_index() 
+#         print(">>> build_index() completed:", result)
+#         return BuildIndexResponse(
+#             message="Index built successfully",
+#             index_name=req.index_name
+#         )
+#     except Exception as e:
+#         print(">>> ERROR in build_index():")
+#         traceback.print_exc()
+#         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/delete_index/{index_name}")
 def delete_index(index_name: str):
