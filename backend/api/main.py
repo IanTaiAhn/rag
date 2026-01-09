@@ -72,10 +72,33 @@ BACKEND_ROOT = Path(__file__).resolve().parent.parent
 UPLOAD_DIR = BACKEND_ROOT / "uploaded_docs" 
 UPLOAD_DIR.mkdir(exist_ok=True)
 
+
 @app.post("/ask_question", response_model=QueryResponse)
-def query_rag(request: QueryRequest):
-    result = ask_question(request.query, index_name=request.index_name)
-    return QueryResponse(**result)
+async def query_rag(request: QueryRequest):
+    try:
+        print(">>> Warming up Jina…")
+        await warm_up_jina()
+
+        print(">>> Running ask_question() in threadpool…")
+        result = await asyncio.to_thread(
+            ask_question,
+            request.query,
+            request.index_name
+        )
+
+        print(">>> ask_question() completed")
+        return QueryResponse(**result)
+
+    except Exception as e:
+        print(">>> ERROR in ask_question():")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+    
+# OLD ASK_QUESTION
+# @app.post("/ask_question", response_model=QueryResponse)
+# def query_rag(request: QueryRequest):
+#     result = ask_question(request.query, index_name=request.index_name)
+#     return QueryResponse(**result)
 
 @app.post("/build_index", response_model=BuildIndexResponse)
 async def api_build_index(req: BuildIndexRequest):
