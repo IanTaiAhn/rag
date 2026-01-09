@@ -44,6 +44,7 @@ tqdm==4.67.1
 
 python-multipart==0.0.9
 
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.3.1+cpu
-sentence-transformers==3.0.1
+# Going to avoid using this dependency because it is quite large, 300mb...
+# --extra-index-url https://download.pytorch.org/whl/cpu
+# torch==2.3.1+cpu
+# sentence-transformers==3.0.1

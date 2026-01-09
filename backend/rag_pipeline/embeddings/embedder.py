@@ -1,45 +1,59 @@
 import os
+import requests
 from typing import List
-from sentence_transformers import SentenceTransformer
-
 
 class BaseEmbedder:
     def embed(self, texts: List[str]) -> List[List[float]]:
         raise NotImplementedError
 
-
-# -------------------------
-# Local SentenceTransformer embedder
-# -------------------------
-class LocalEmbedder(BaseEmbedder):
+class JinaEmbedder(BaseEmbedder):
     """
-    Uses a local sentence-transformers model for embeddings.
+    Uses Jina AI's hosted Embeddings API.
+    Docs: https://docs.jina.ai/embeddings
     """
 
     def __init__(self, model_name: str = None):
-        # Default to MiniLM if not provided
+        self.api_key = os.getenv("JINA_API_KEY")
+        if not self.api_key:
+            raise ValueError("JINA_API_KEY environment variable is required for JinaEmbedder")
+
+        # Default model (recommended)
         self.model_name = model_name or os.getenv(
-            "EMBEDDING_MODEL",
-            "sentence-transformers/all-MiniLM-L6-v2"
+            "JINA_EMBEDDING_MODEL",
+            "jina-embeddings-v3"
         )
 
-        print(">>> Loading local embedding model:", self.model_name)
+        self.api_url = "https://api.jina.ai/v1/embeddings"
 
-        # Load model once at startup
-        self.model = SentenceTransformer(self.model_name)
+        self.headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
 
-    def embed(self, texts: List[str]) -> List[List[float]]:
-        if isinstance(texts, str):
-            texts = [texts]
+    def embed(self, texts: List[str]):
+        """
+        Sends a batch of texts to Jina's embedding endpoint.
+        Returns a list of embedding vectors.
+        """
 
-        # Returns List[List[float]]
-        embeddings = self.model.encode(
-            texts,
-            convert_to_numpy=True,
-            normalize_embeddings=True  # optional but recommended for FAISS
-        )
+        payload = {
+            "model": self.model_name,
+            "input": texts
+        }
 
-        return embeddings.tolist()
+        response = requests.post(self.api_url, headers=self.headers, json=payload)
+
+        if response.status_code != 200:
+            raise RuntimeError(
+                f"Jina API error {response.status_code}: {response.text}"
+            )
+
+        data = response.json()
+
+        # Jina returns: { "data": [ { "embedding": [...] }, ... ] }
+        embeddings = [item["embedding"] for item in data["data"]]
+
+        return embeddings
 
 
 # -------------------------
@@ -47,7 +61,13 @@ class LocalEmbedder(BaseEmbedder):
 # -------------------------
 def get_embedder():
     """
-    Always return the local embedder.
-    HF API is no longer used for embeddings.
+    Returns the Jina embedder if JINA_API_KEY is set.
     """
-    return LocalEmbedder()
+    if os.getenv("JINA_API_KEY"):
+        return JinaEmbedder()
+
+    raise RuntimeError("No embedding backend configured. Set JINA_API_KEY.")
+
+
+
+
