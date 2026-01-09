@@ -81,21 +81,22 @@ def query_rag(request: QueryRequest):
 async def api_build_index(req: BuildIndexRequest):
     try:
         print(">>> Warming up Jina…")
-        await warm_up_jina()   # <-- integrate here
+        await warm_up_jina()
 
         print(">>> Starting build_index()")
-        result = await build_index()   # if build_index is async
-        # or: result = build_index()   # if it's sync
+        result = await asyncio.to_thread(build_index)
 
         print(">>> build_index() completed:", result)
         return BuildIndexResponse(
             message="Index built successfully",
             index_name=req.index_name
         )
+
     except Exception as e:
         print(">>> ERROR in build_index():")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
 # OLD BUILD_INDEX
 # @app.post("/build_index", response_model=BuildIndexResponse)
 # def api_build_index(req: BuildIndexRequest):
