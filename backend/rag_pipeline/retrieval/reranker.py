@@ -15,7 +15,7 @@ class Reranker:
         # Default recommended model
         self.model_name = model_name or os.getenv(
             "JINA_RERANKER_MODEL",
-            "jina-reranker-v1"
+            "jina-reranker-v3"
         )
 
         self.api_url = "https://api.jina.ai/v1/rerank"
