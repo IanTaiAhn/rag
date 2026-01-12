@@ -100,3 +100,6 @@ Try to implement these reranker/embedding models instead:
 * Jina Reranker v1 (free, cross‑encoder quality), https://huggingface.co/jinaai/jina-reranker-v1-turbo-en
 * Remove sentence_transformers if possible and use only api calls.
 * example api call? POST https://api.jina.ai/v1/embeddings
+
+In the end Jina did work indeed. However, the free api basically functioned as a one-time use until inactivity would throttle any requests afterwards.
+Pretty good for a completely free and hosted rag pipeline, but it's a shame there are no more free tiers out there.
